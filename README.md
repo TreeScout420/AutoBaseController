@@ -1,7 +1,8 @@
 ==================================================
 Download AutoBaseController
 ==================================================
-Download here: [AutoBaseController_1.0.zip](https://github.com/user-attachments/files/26739589/AutoBaseController_1.0.zip)
+Download here: [AutoBaseController.zip](https://github.com/user-attachments/files/26740232/AutoBaseController.zip)
+
 
 
 AutoBases Controller - Config Details
@@ -455,4 +456,4 @@ That command is the fastest way to find a config mistake.
 ==================================================
 Download AutoBaseController
 ==================================================
-Download here: [AutoBaseController_1.0.zip](https://github.com/user-attachments/files/26739589/AutoBaseController_1.0.zip)
+Download here: [AutoBaseController.zip](https://github.com/user-attachments/files/26740232/AutoBaseController.zip)
