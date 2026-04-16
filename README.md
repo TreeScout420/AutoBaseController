@@ -2,7 +2,8 @@
 Download AutoBaseController
 ===========================
 
-Download here: [AutoBaseController.zip](https://github.com/user-attachments/files/26740232/AutoBaseController.zip)
+Download here:
+https://github.com/user-attachments/files/26771021/AutoBasesController_1.1.zip
 
 ==================================================
 AutoBases Controller - Config Details
@@ -19,7 +20,7 @@ This bot uses your config to:
 * connect to your servers through RCON
 * control spawning, retries, cooldowns, and cap enforcement
 
-The config has 6 main sections:
+The config has 7 main sections:
 
 * discord
 * scheduler
@@ -27,6 +28,7 @@ The config has 6 main sections:
 * maps
 * rcon_servers
 * logging
+* live_feeds
 
 ==================================================
 AUTOBASES PLUGIN REQUIREMENTS
@@ -35,8 +37,6 @@ AUTOBASES PLUGIN REQUIREMENTS
 This bot completely replaces AutoBases AutoSpawn.
 
 You MUST disable AutoSpawn in your AutoBases config.
-
-Remove or disable any AutoSpawn settings.
 
 If AutoSpawn is enabled:
 
@@ -48,242 +48,81 @@ If AutoSpawn is enabled:
 VERY IMPORTANT: HOW MAP KEYS WORK
 =================================
 
-The names like:
+Map keys (like island, rag, etc.) are NOT special values.
 
-* island
-* rag
-* center
-* ext
+They are simply labels that must match between:
 
-are NOT special built-in values.
+* maps
+* rcon_servers
 
-They are just labels used to link the config together.
-
-Example:
-
-"maps": {
-"island": { ... }
-}
-
-"rcon_servers": {
-"island": { ... }
-}
-
-The key MUST match in BOTH places.
-
-You can rename them if you want, for example:
-
-"maps": {
-"my_island": { ... }
-}
-
-"rcon_servers": {
-"my_island": { ... }
-}
-
-That is completely fine, as long as both sections use the exact same name.
-
-If they do NOT match, the bot will fail setup/validation.
+If they do NOT match → the bot will fail setup.
 
 ==================================================
 DISCORD SECTION
 ===============
 
-Example:
+log_channel_id is used for BOTH modes:
 
-"discord": {
-"token": "PUT_BOT_TOKEN_HERE",
-"admin_channel_id": 111111111111111111,
-"log_channel_id": 222222222222222222,
-"webhook_feed_channel_id": 333333333333333333
+* Logging mode → posts messages
+* Live feed mode → shows persistent panels
+
+==================================================
+LOGGING MODE VS LIVE FEEDS (IMPORTANT)
+======================================
+
+This bot supports TWO display modes.
+
+Controlled by:
+
+"logging": {
+"enabled": true/false
 }
 
-token
+---
 
-* Your Discord bot token
-* Keep this private
+## LOGGING MODE (enabled = true)
 
-admin_channel_id
+* Posts individual log messages
+* Creates full event history
+* Can be spammy
 
-* Channel where you run bot commands
-* Examples:
+Controlled by:
 
-  * !absetup
-  * !abstatus
-  * !abspawn
+* log_spawn_attempts
+* log_resyncs
+* log_webhook_events
+* log_spawn_failures
+* log_spawn_timeouts
 
-log_channel_id
+---
 
-* Channel where the bot posts:
+## LIVE FEED MODE (enabled = false)
 
-  * dashboard
-  * logs
-  * cap enforcement events
+* Uses persistent embeds (NO spam)
+* Messages are edited, not reposted
+* Clean dashboard-style display
 
-webhook_feed_channel_id
+Includes:
 
-* MUST be the channel where AutoBases webhook posts
-* Bot MUST have read access
-* If wrong, bot will miss ACTIVE and COMPLETED events
+* Overview panel (all maps)
+* Details panel (rotating pages)
+* Recent activity panel
+
+---
+
+## RECOMMENDED DEFAULT
+
+logging.enabled = false
 
 ==================================================
 SCHEDULER SECTION
 =================
 
-Example:
-
-"scheduler": {
-"mode": "per_map",
-"tick_seconds": 60,
-"spawn_retry_timeout_seconds": 45,
-"startup_resync": true,
-"cluster_spawn_interval_minutes": 120,
-"periodic_resync_minutes": 15,
-"spawn_retry_attempts": 3
-}
-
-mode
-
-* per_map → each map runs independently (recommended)
-* cluster → shared timer across maps
-
-tick_seconds
-
-* How often the bot checks for work
-
 spawn_retry_timeout_seconds
 
-* How long before a spawn is considered stuck
-
-startup_resync
-
-* Sync active bases on startup (recommended: true)
-
-cluster_spawn_interval_minutes
-
-* Only used in cluster mode
-
-periodic_resync_minutes
-
-* Failsafe resync (recommended: keep enabled)
-
-spawn_retry_attempts
-
-* Retry attempts if spawn fails
-
-==================================================
-CAP ENFORCEMENT SECTION
-=======================
-
-Example:
-
-"cap_enforcement": {
-"enabled": false,
-"mode": "destroy_newest"
-}
-
-enabled
-
-* Automatically enforce max_active
-
-mode
-
-* destroy_newest → removes newest bases first
-* destroy_oldest → removes oldest bases first
-* log_only → detects but does not delete (best for testing)
-
-==================================================
-MAPS SECTION
-============
-
-Example:
-
-"maps": {
-"island": {
-"plugin_map_name": "TheIsland_WP",
-"enabled": true,
-"max_active": 2,
-"cooldown_minutes": 30,
-"spawn_interval_minutes": 120,
-"spawn_weight": 1,
-"spawn_groups": [
-{ "name": "Tier1", "weight": 1 },
-{ "name": "Tier2", "weight": 1 }
-]
-}
-}
-
-plugin_map_name
-
-* MUST match AutoBases webhook exactly
-
-enabled
-
-* true = enabled
-* false = ignored
-
-max_active
-
-* Max active bases allowed
-
-cooldown_minutes
-
-* Delay after completion before next spawn
-
-spawn_interval_minutes
-
-* Minimum time between spawns
-
-spawn_weight
-
-* Used in cluster mode
-
-spawn_groups
-
-* Groups allowed to spawn
-
-Simple:
-"spawn_groups": ["Tier1", "Tier2"]
-
-Weighted:
-"spawn_groups": [
-{ "name": "Tier1", "weight": 1 },
-{ "name": "Tier2", "weight": 3 }
-]
-
-==================================================
-RCON_SERVERS SECTION
-====================
-
-Example:
-
-"rcon_servers": {
-"island": {
-"display_name": "The Island",
-"host": "127.0.0.1",
-"port": 27020,
-"password": "PUT_RCON_PASSWORD_HERE"
-}
-}
-
-IMPORTANT:
-Keys MUST match "maps" section.
-
-display_name
-
-* Friendly name for logs
-
-host
-
-* Server IP (127.0.0.1 = local)
-
-port
-
-* RCON port
-
-password
-
-* Must match server RCON password
+* Time before a spawn is considered delayed
+* Recommended: 120
+* Lower values can cause false timeout warnings
 
 ==================================================
 LOGGING SECTION
@@ -292,47 +131,67 @@ LOGGING SECTION
 Example:
 
 "logging": {
+"enabled": false,
 "log_spawn_attempts": false,
 "log_resyncs": false,
-"log_webhook_events": false
+"log_webhook_events": false,
+"log_spawn_failures": false,
+"log_spawn_timeouts": false
 }
 
-log_spawn_attempts
+enabled
 
-* Debug spawn attempts
+* TRUE → log messages
+* FALSE → live feed panels (recommended)
 
-log_resyncs
+==================================================
+LIVE_FEEDS SECTION
+==================
 
-* Debug resync activity
+Used when logging.enabled = false
 
-log_webhook_events
+overview_enabled
 
-* Debug webhook parsing
+* Shows summary of all maps
+
+details_enabled
+
+* Shows rotating detailed view
+
+events_enabled
+
+* Shows recent activity panel
+
+details_maps_per_page
+
+* Number of maps shown at once
+
+events_limit
+
+* Number of events stored
 
 ==================================================
 WHY NOTHING IS SPAWNING
 =======================
 
-If the bot is running but nothing is spawning, the most common reasons are:
+Most common reasons:
 
-* The map is already at max_active
-* No bases have been completed yet
-* Cooldown is still active
-* Spawn interval has not been reached
-* Webhook events are missing
+* Map is at max_active
+* Cooldown still active
+* Spawn interval not ready
+* Webhook events missing
 
 IMPORTANT:
 
 If webhook messages are missing:
 
 * Active bases may never clear
-* Maps may stay permanently "full"
+* Maps may stay permanently full
 * Spawning will stop
 
 Run:
-!abstatus
 
-This will show exactly what each map is waiting on.
+!abstatus
 
 ==================================================
 RECOMMENDED STARTER SETTINGS
@@ -342,13 +201,8 @@ RECOMMENDED STARTER SETTINGS
 * startup_resync = true
 * periodic_resync_minutes = 15
 * spawn_retry_attempts = 3
-* cap_enforcement.enabled = false (initially)
-* logging = all false (use dashboard instead)
-
-After testing:
-
-* enable cap_enforcement
-* optionally use log_only first
+* cap_enforcement.enabled = false
+* logging.enabled = false
 
 ==================================================
 FIRST RUN CHECKLIST
@@ -356,12 +210,12 @@ FIRST RUN CHECKLIST
 
 1. Set Discord token
 2. Set channel IDs
-3. Set RCON host, port, password
-4. Ensure map keys match
+3. Set RCON info
+4. Match map keys
 5. Verify webhook channel
 6. Start bot
 7. Run !absetup
-8. Fix any issues
+8. Fix issues
 9. Run !abstatus
 
 ==================================================
@@ -385,13 +239,13 @@ Setup fails
 
 * Check IDs
 * Check token
-* Check RCON settings
+* Check RCON
 * Check key matching
 
 Webhook not detected
 
-* Check webhook channel ID
-* Check bot permissions
+* Check webhook channel
+* Check permissions
 * Confirm AutoBases is posting
 
 ==================================================
@@ -414,8 +268,9 @@ MAIN COMMANDS
 FINAL NOTE
 ==========
 
-If something is not working, run:
+If something is not working:
 
 !absetup
 
-This is the fastest way to find configuration issues.
+This will tell you exactly what is wrong.
+
